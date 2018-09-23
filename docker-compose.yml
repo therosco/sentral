@@ -67,4 +67,4 @@ services:
       - backend
     user: "33"
     entrypoint: /bin/sh
-    command: -c "/tmp/wait-for-it.sh mysql:3306 && cd /var/www/html/app/sentral && composer -vvv install && php bin/console doctrine:database:create --if-not-exists && php bin/console doctrine:migrations:migrate --no-interaction --write-sql"
+    command: -c "/tmp/wait-for-it.sh mysql:3306 && cd /var/www/html/app/sentral && composer -vvv install && php bin/console doctrine:database:create --if-not-exists && php bin/console doctrine:migrations:migrate --no-interaction --write-sql && php bin/console ckeditor:install && php bin/console assets:install public"
