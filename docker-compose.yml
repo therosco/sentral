@@ -1,0 +1,70 @@
+version: '3'
+
+networks:
+  backend:
+
+volumes:
+  site:
+  database:
+
+services:
+  site:
+    container_name: site
+    restart: always
+    build:
+      context: ./
+      dockerfile: $PWD/.docker/Dockerfile
+    environment:
+      - DATABASE_URL=mysql://root:@mysql:3306/sentral
+      - HERE_APP_ID=1CPcGzthDAM1xKuIFiNT
+      - HERE_APP_CODE=j70HbqChBj9zkAaUux6ucQ
+    volumes:
+      - $PWD:/var/www/html:rw
+    depends_on:
+      - mysql
+    networks: 
+      - backend
+    user: "33"
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    restart: always
+    volumes:
+      - $PWD:/var/www/html:ro
+      - $PWD/.docker/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - $PWD/.docker/etc/nginx/conf.d/site.conf:/etc/nginx/conf.d/site.conf
+    depends_on:
+      - site
+    networks: 
+      - backend
+    ports:
+      - "80:80"
+    command: [nginx-debug, '-g', 'daemon off;']
+
+  mysql:
+    container_name: mysql
+    image: mariadb:10
+    restart: always
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    networks: 
+      - backend
+    volumes:
+      - "/var/lib/mysql/data:/var/lib/mysql/data:rw"
+
+  site-up:
+    build:
+      context: ./
+      dockerfile: $PWD/.docker/Dockerfile
+    environment:
+      - DATABASE_URL=mysql://root:@mysql:3306/sentral
+    volumes:
+      - $PWD:/var/www/html:rw
+    depends_on:
+      - mysql
+    networks: 
+      - backend
+    user: "33"
+    entrypoint: /bin/sh
+    command: -c "/tmp/wait-for-it.sh mysql:3306 && cd /var/www/html/app/sentral && composer -vvv install && php bin/console doctrine:database:create --if-not-exists && php bin/console doctrine:migrations:migrate --no-interaction --write-sql"

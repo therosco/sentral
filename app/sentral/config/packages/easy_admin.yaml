@@ -1,0 +1,54 @@
+easy_admin:
+  site_name: 'Sentral Education Tech Assessment'
+  list:
+      max_results: 50
+  entities:
+    Activity:
+        class: App\Entity\Activity
+        label: Activity/Event
+        form:
+            fields:
+                - title
+                - { property: description, type: 'FOS\CKEditorBundle\Form\Type\CKEditorType' }
+                - startDate
+                - category
+                - organiser
+                - venue
+        list:
+            fields:
+                - title
+                - startDate
+                - category
+                - organiser
+                - venue
+                - distance
+                - travelTimeMinutes
+    Category:
+        class: App\Entity\Category
+    Invite: 
+        class: App\Entity\Invite
+    Organiser:
+        class: App\Entity\Organiser
+    Payment:
+        class: App\Entity\Payment
+        form:
+            fields:
+                - activity
+                - participant
+                - { property: amount, type: 'Symfony\Component\Form\Extension\Core\Type\MoneyType', label: 'Amount, $', type_options: { currency: 'AUD' } }
+                - payedAt
+                - payedBy
+    Permission:
+        class: App\Entity\Permission
+        form:
+            fields:
+                - activity
+                - participant
+                - permittedAt
+                - permittedBy
+    Role:
+        class: App\Entity\Role
+    User:
+        class: App\Entity\User
+    Venue:
+        class: App\Entity\Venue
